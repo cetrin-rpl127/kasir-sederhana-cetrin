@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Halaman Kasir</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        input { padding: 8px; margin: 5px; }
+        table { border-collapse: collapse; width: 80%; margin-top: 20px; }
+        th, td { border: 1px solid rgb(3, 54, 83); padding: 10px; text-align: center; }
+        .total-box { margin-top: 20px; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+    <h2>Aplikasi Kasir</h2>
+
+    <!-- Form Input Barang -->
+    <div class="form-input"> 
+        <input id="buku" type="text" placeholder="buku">
+        <input id="3.000" type="number" placeholder="3.000">
+        <input id="5" type="number" placeholder="5">
+        <button onclick="tambahBarang()">Tambah Barang</button>
+    </div>
+
+    <!-- Input Diskon -->
+    <div class="diskon-box">
+        <input id="diskon" type="number" placeholder="Diskon (%)" oninput="hitungTotal()">
+    </div>
+
+    <!-- Tabel Daftar Belanja -->
+    <table id="tabel">
+        <tr>
+            <th>Nama</th>
+            <th>Harga</th>
+            <th>Jumlah</th>
+            <th>Subtotal</th>
+            <th>Aksi</th>
+        </tr>
+    </table>
+
+    <!-- Total Harga -->
+    <div class="total-box">
+        Subtotal: Rp <span id="subtotal">0</span><br>
+        Diskon: Rp <span id="diskonValue">0</span><br>
+        Pajak (PPN 11%): Rp <span id="pajak">0</span><br>
+        <b>Total Akhir: Rp <span id="totalAkhir">0</span></b>
+    </div>
+
+    <script>
+        let dataBelanja = [];
+
+        function tambahBarang() {
+            let nama = document.getElementById("nama").value;
+            let harga = parseInt(document.getElementById("harga").value);
+            let jumlah = parseInt(document.getElementById("jumlah").value);
+
+            if (!nama || !harga || !jumlah) {
+                alert("Isi semua data barang!");
+                return;
+            }
+
+            dataBelanja.push({ nama, harga, jumlah });
+            renderTabel();
+            hitungTotal();
+        }
+
+        function hapusItem(index) {
+            dataBelanja.splice(index, 1);
+            renderTabel();
+            hitungTotal();
+        }
+
+        function renderTabel() {
+            let tabel = document.getElementById("tabel");
+
+            // Hapus semua baris kecuali header
+            tabel.innerHTML = `
+                <tr>
+                    <th>Nama</th>
+                    <th>Harga</th>
+                    <th>Jumlah</th>
+                    <th>Subtotal</th>
+                    <th>Aksi</th>
+                </tr>
+            `;
+
+            dataBelanja.forEach((item, i) => {
+                let row = tabel.insertRow(-1);
+
+                row.insertCell(0).innerHTML = item.nama;
+                row.insertCell(1).innerHTML = item.harga;
+                row.insertCell(2).innerHTML = item.jumlah;
+                row.insertCell(3).innerHTML = item.harga * item.jumlah;
+                row.insertCell(4).innerHTML = `<button onclick="hapusItem(${i})">Hapus</button>`;
+            });
+        }
+
+        function hitungTotal() {
+            let subtotal = 0;
+
+            dataBelanja.forEach(item => {
+                subtotal += item.harga * item.jumlah;
+            });
+
+            let diskonPersen = parseFloat(document.getElementById("diskon").value) || 0;
+            let nilaiDiskon = subtotal * (diskonPersen / 100);
+
+            let pajak = (subtotal - nilaiDiskon) * 0.11;
+            let totalAkhir = subtotal - nilaiDiskon + pajak;
+
+            document.getElementById("subtotal").innerText = subtotal;
+            document.getElementById("diskonValue").innerText = Math.floor(nilaiDiskon);
+            document.getElementById("pajak").innerText = Math.floor(pajak);
+            document.getElementById("totalAkhir").innerText = Math.floor(totalAkhir);
+        }
+    </script>
+
+</body>
+</html>
